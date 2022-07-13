@@ -1,17 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Calculator.App
 {
@@ -31,13 +19,15 @@ namespace Calculator.App
 
         private void ButtonClickNumber(object sender, RoutedEventArgs e)
         {
-            if ((string?)((sender as Button)?.Content) == "0" && _input == null) return;
+            if ((string?)((sender as Button)?.Content) == "0" && (_input == null || _input[_input.Length - 1] == ' ')) return;
             _input += (sender as Button)?.Content;
             Input.Text = _input;
         }
         private void ButtonClickPoint(object sender, RoutedEventArgs e)
         {
-            if (_input?[_input.Length - 1] == ' ' || _flagPoint == true || _input == null) return;
+            if (_input?[_input.Length - 1] == ' ' || _flagPoint == true) return;
+            if (_input == null) _input += "0";
+            
             _flagPoint = true;
             _input += (sender as Button)?.Content;
             Input.Text = _input;
@@ -51,7 +41,7 @@ namespace Calculator.App
         }
         private void ButtonClickEnter(object sender, RoutedEventArgs e)
         {
-            double value = 0, result = 0;
+            double value = 0;
             if (_input?[_input.Length - 1] == ' ' || _input == null) return;
             string[] partsExpression = _input.Split(' ');
             for (int i = 1; i < partsExpression.Length; i += 2)
@@ -59,7 +49,7 @@ namespace Calculator.App
                 switch (partsExpression[i])
                 {
                     case "+":
-                        value = double.Parse(partsExpression[i - 1]) + double.Parse(partsExpression[i + 1])+0.00000001;
+                        value = double.Parse(partsExpression[i - 1]) + double.Parse(partsExpression[i + 1]) + 0.00000001;
                         break;
                     case "-":
                         value = double.Parse(partsExpression[i - 1]) - double.Parse(partsExpression[i + 1]);
@@ -92,7 +82,7 @@ namespace Calculator.App
             }
             if (_input[_input.Length - 1] == ' ') count = 3;
             _input = _input.Remove(_input.Length - count, count);
-            
+
             if (_input.Length == 0) _input = null;
 
             if (_input == null) Input.Text = "0";
@@ -104,7 +94,7 @@ namespace Calculator.App
             while (_input.Length != 0)
             {
                 if (_input[_input.Length - 1] == ' ') break;
-                _input = _input.Remove(_input.Length - 1,1);
+                _input = _input.Remove(_input.Length - 1, 1);
             }
             if (_input.Length == 0) _input = null;
             if (_input == null) Input.Text = "0";
@@ -114,7 +104,7 @@ namespace Calculator.App
         {
             if (_input == null) return;
             while (_input.Length != 0)
-            {               
+            {
                 _input = _input.Remove(_input.Length - 1, 1);
             }
             if (_input.Length == 0) _input = null;
