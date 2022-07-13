@@ -20,6 +20,8 @@ namespace Calculator.App
         private void ButtonClickNumber(object sender, RoutedEventArgs e)
         {
             if ((string?)((sender as Button)?.Content) == "0" && (_input == null || _input[_input.Length - 1] == ' ')) return;
+            //if (_input[_input.Length - 1] == '0' && _input[_input.Length - 2] == ' ') return;
+            
             _input += (sender as Button)?.Content;
             Input.Text = _input;
         }
@@ -96,9 +98,7 @@ namespace Calculator.App
                 if (_input[_input.Length - 1] == ' ') break;
                 _input = _input.Remove(_input.Length - 1, 1);
             }
-            if (_input.Length == 0) _input = null;
-            if (_input == null) Input.Text = "0";
-            else Input.Text = _input;
+            Print();
         }
         private void ButtonClickC(object sender, RoutedEventArgs e)
         {
@@ -107,6 +107,10 @@ namespace Calculator.App
             {
                 _input = _input.Remove(_input.Length - 1, 1);
             }
+            Print();
+        } 
+        private void Print()
+        {
             if (_input.Length == 0) _input = null;
             if (_input == null) Input.Text = "0";
             else Input.Text = _input;
