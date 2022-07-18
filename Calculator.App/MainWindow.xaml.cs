@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System;
+using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace Calculator.App
@@ -9,28 +11,34 @@ namespace Calculator.App
     public partial class MainWindow : Window
     {
         private string? _input = null;
+        private string[] partsExpression;
+        private List<string> ListPartsExpression;
         private bool _flagPoint = false;
+        private bool _flagFirstZero = false;
         private string _result;
         public MainWindow()
         {
+            ListPartsExpression = new List<string>();
             InitializeComponent();
         }
 
 
         private void ButtonClickNumber(object sender, RoutedEventArgs e)
         {
-            if ((string?)((sender as Button)?.Content) == "0" && (_input == null || _input[_input.Length - 1] == ' ')) return;
-            //if (_input[_input.Length - 1] == '0' && _input[_input.Length - 2] == ' ') return;
-            
-            _input += (sender as Button)?.Content;
-            Input.Text = _input;
+            if (!_flagFirstZero)
+            {
+                _input += (sender as Button)?.Content;
+                Input.Text = _input;
+                _flagFirstZero = false;
+            }
+            if (_input == "0") _flagFirstZero = true;
+            if (_input[_input.Length - 1] == ' ' && (string?)((sender as Button)?.Content) == "0") _flagFirstZero = true;
         }
         private void ButtonClickPoint(object sender, RoutedEventArgs e)
         {
             if (_input?[_input.Length - 1] == ' ' || _flagPoint == true) return;
-            if (_input == null) _input += "0";
-            
             _flagPoint = true;
+            _flagFirstZero = false;
             _input += (sender as Button)?.Content;
             Input.Text = _input;
         }
@@ -39,38 +47,61 @@ namespace Calculator.App
             if (_input?[_input.Length - 1] == ' ' || _input == null) return;
             _input += (" " + (sender as Button)?.Content) + " ";
             _flagPoint = false;
+            _flagFirstZero = false;
             Input.Text = _input;
         }
         private void ButtonClickEnter(object sender, RoutedEventArgs e)
         {
-            double value = 0;
+            int index;
             if (_input?[_input.Length - 1] == ' ' || _input == null) return;
-            string[] partsExpression = _input.Split(' ');
-            for (int i = 1; i < partsExpression.Length; i += 2)
+            partsExpression = _input.Split(' ');
+
+            for (int i = 0; i < partsExpression.Length; i++)
             {
-                switch (partsExpression[i])
-                {
-                    case "+":
-                        value = double.Parse(partsExpression[i - 1]) + double.Parse(partsExpression[i + 1]) + 0.00000001;
-                        break;
-                    case "-":
-                        value = double.Parse(partsExpression[i - 1]) - double.Parse(partsExpression[i + 1]);
-                        break;
-                    case "*":
-                        value = double.Parse(partsExpression[i - 1]) * double.Parse(partsExpression[i + 1]);
-                        break;
-                    case "/":
-                        value = double.Parse(partsExpression[i - 1]) / double.Parse(partsExpression[i + 1]);
-                        break;
-                    default:
-                        break;
-                }
+                ListPartsExpression.Add(partsExpression[i]);
             }
-            _result = value.ToString();
+            do
+            {
+                index = ListPartsExpression.IndexOf("*");
+                if (index != -1)
+                {
+                    MultiplicationByIndex(index);
+                }
+            } while (index != -1);
+            do
+            {
+                index = ListPartsExpression.IndexOf("/");
+                if (index != -1)
+                {
+                    DivisionByIndex(index);
+                }
+            } while (index != -1);
+            do
+            {
+                index = ListPartsExpression.IndexOf("+");
+                if (index != -1)
+                {
+                    SumByIndex(index);
+                }
+            } while (index != -1);
+            do
+            {
+                index = ListPartsExpression.IndexOf("-");
+                if (index != -1)
+                {
+                    DifferenceByIndex(index);
+                }
+            } while (index != -1);
+
+
+
+            _result = ListPartsExpression[0].ToString();
             OutResult.Text = _result;
             _input = null;
             Input.Text = "0";
             _flagPoint = false;
+            _flagFirstZero = false;
+            ListPartsExpression.Clear();
         }
 
         private void ButtonClickDel(object sender, RoutedEventArgs e)
@@ -80,12 +111,24 @@ namespace Calculator.App
             if (_input[_input.Length - 1] == ',')
             {
                 _flagPoint = false;
-                return;
+               
             }
-            if (_input[_input.Length - 1] == ' ') count = 3;
+            if (_input[_input.Length - 1] == ' ')
+            {
+                count = 3;
+                _flagFirstZero = false;
+            }
+
+            
             _input = _input.Remove(_input.Length - count, count);
 
-            if (_input.Length == 0) _input = null;
+            if (_input.Length == 0)
+            {
+                _input = null;
+                _flagPoint = false;
+                _flagFirstZero = false;
+            }
+            
 
             if (_input == null) Input.Text = "0";
             else Input.Text = _input;
@@ -98,6 +141,8 @@ namespace Calculator.App
                 if (_input[_input.Length - 1] == ' ') break;
                 _input = _input.Remove(_input.Length - 1, 1);
             }
+            _flagPoint = false;
+            _flagFirstZero = false;
             Print();
         }
         private void ButtonClickC(object sender, RoutedEventArgs e)
@@ -107,13 +152,43 @@ namespace Calculator.App
             {
                 _input = _input.Remove(_input.Length - 1, 1);
             }
+            _flagPoint = false;
+            _flagFirstZero = false;
             Print();
-        } 
+        }
         private void Print()
         {
             if (_input.Length == 0) _input = null;
             if (_input == null) Input.Text = "0";
             else Input.Text = _input;
+        }
+        private void MultiplicationByIndex(int index)
+        {
+            double result = double.Parse(ListPartsExpression[index - 1]) * double.Parse(ListPartsExpression[index + 1]);
+            ListPartsExpression[index] = result.ToString();
+            ListPartsExpression.RemoveAt(index + 1);
+            ListPartsExpression.RemoveAt(index - 1);
+        }
+        private void DivisionByIndex(int index)
+        {
+            double result = double.Parse(ListPartsExpression[index - 1]) / double.Parse(ListPartsExpression[index + 1]);
+            ListPartsExpression[index] = result.ToString();
+            ListPartsExpression.RemoveAt(index + 1);
+            ListPartsExpression.RemoveAt(index - 1);
+        }
+        private void DifferenceByIndex(int index)
+        {
+            double result = double.Parse(ListPartsExpression[index - 1]) - double.Parse(ListPartsExpression[index + 1]);
+            ListPartsExpression[index] = result.ToString();
+            ListPartsExpression.RemoveAt(index + 1);
+            ListPartsExpression.RemoveAt(index - 1);
+        }
+        private void SumByIndex(int index)
+        {
+            double result = double.Parse(ListPartsExpression[index - 1]) + double.Parse(ListPartsExpression[index + 1]);
+            ListPartsExpression[index] = result.ToString();
+            ListPartsExpression.RemoveAt(index + 1);
+            ListPartsExpression.RemoveAt(index - 1);
         }
     }
 }
