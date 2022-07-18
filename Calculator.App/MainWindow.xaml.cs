@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -8,14 +10,30 @@ namespace Calculator.App
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        private string? _input = null;
+        private string? _inputSrt = null;
+        public string InputStr
+        {
+            get => _inputSrt;
+            set
+            {
+                if (value is null) return;
+                if (value == _inputSrt) return;
+                _inputSrt = value;
+                OnPropertyChanged(nameof(InputStr));
+            }
+        }
+
         private string[] partsExpression;
         private List<string> ListPartsExpression;
         private bool _flagPoint = false;
         private bool _flagFirstZero = false;
         private string _result;
+
+        
+
+
         public MainWindow()
         {
             ListPartsExpression = new List<string>();
@@ -27,34 +45,34 @@ namespace Calculator.App
         {
             if (!_flagFirstZero)
             {
-                _input += (sender as Button)?.Content;
-                Input.Text = _input;
+                _inputSrt += (sender as Button)?.Content;
+                Input.Text = _inputSrt;
                 _flagFirstZero = false;
             }
-            if (_input == "0") _flagFirstZero = true;
-            if (_input[_input.Length - 1] == ' ' && (string?)((sender as Button)?.Content) == "0") _flagFirstZero = true;
+            if (_inputSrt == "0") _flagFirstZero = true;
+            if (_inputSrt[_inputSrt.Length - 1] == ' ' && (string?)((sender as Button)?.Content) == "0") _flagFirstZero = true;
         }
         private void ButtonClickPoint(object sender, RoutedEventArgs e)
         {
-            if (_input?[_input.Length - 1] == ' ' || _flagPoint == true) return;
+            if (_inputSrt?[_inputSrt.Length - 1] == ' ' || _flagPoint == true) return;
             _flagPoint = true;
             _flagFirstZero = false;
-            _input += (sender as Button)?.Content;
-            Input.Text = _input;
+            _inputSrt += (sender as Button)?.Content;
+            Input.Text = _inputSrt;
         }
         private void ButtonClickAction(object sender, RoutedEventArgs e)
         {
-            if (_input?[_input.Length - 1] == ' ' || _input == null) return;
-            _input += (" " + (sender as Button)?.Content) + " ";
+            if (_inputSrt?[_inputSrt.Length - 1] == ' ' || _inputSrt == null) return;
+            _inputSrt += (" " + (sender as Button)?.Content) + " ";
             _flagPoint = false;
             _flagFirstZero = false;
-            Input.Text = _input;
+            Input.Text = _inputSrt;
         }
         private void ButtonClickEnter(object sender, RoutedEventArgs e)
         {
             int index;
-            if (_input?[_input.Length - 1] == ' ' || _input == null) return;
-            partsExpression = _input.Split(' ');
+            if (_inputSrt?[_inputSrt.Length - 1] == ' ' || _inputSrt == null) return;
+            partsExpression = _inputSrt.Split(' ');
 
             for (int i = 0; i < partsExpression.Length; i++)
             {
@@ -97,7 +115,7 @@ namespace Calculator.App
 
             _result = ListPartsExpression[0].ToString();
             OutResult.Text = _result;
-            _input = null;
+            _inputSrt = null;
             Input.Text = "0";
             _flagPoint = false;
             _flagFirstZero = false;
@@ -107,39 +125,39 @@ namespace Calculator.App
         private void ButtonClickDel(object sender, RoutedEventArgs e)
         {
             int count = 1;
-            if (_input == null) return;
-            if (_input[_input.Length - 1] == ',')
+            if (_inputSrt == null) return;
+            if (_inputSrt[_inputSrt.Length - 1] == ',')
             {
                 _flagPoint = false;
                
             }
-            if (_input[_input.Length - 1] == ' ')
+            if (_inputSrt[_inputSrt.Length - 1] == ' ')
             {
                 count = 3;
                 _flagFirstZero = false;
             }
 
             
-            _input = _input.Remove(_input.Length - count, count);
+            _inputSrt = _inputSrt.Remove(_inputSrt.Length - count, count);
 
-            if (_input.Length == 0)
+            if (_inputSrt.Length == 0)
             {
-                _input = null;
+                _inputSrt = null;
                 _flagPoint = false;
                 _flagFirstZero = false;
             }
             
 
-            if (_input == null) Input.Text = "0";
-            else Input.Text = _input;
+            if (_inputSrt == null) Input.Text = "0";
+            else Input.Text = _inputSrt;
         }
         private void ButtonClickCE(object sender, RoutedEventArgs e)
         {
-            if (_input == null) return;
-            while (_input.Length != 0)
+            if (_inputSrt == null) return;
+            while (_inputSrt.Length != 0)
             {
-                if (_input[_input.Length - 1] == ' ') break;
-                _input = _input.Remove(_input.Length - 1, 1);
+                if (_inputSrt[_inputSrt.Length - 1] == ' ') break;
+                _inputSrt = _inputSrt.Remove(_inputSrt.Length - 1, 1);
             }
             _flagPoint = false;
             _flagFirstZero = false;
@@ -147,10 +165,10 @@ namespace Calculator.App
         }
         private void ButtonClickC(object sender, RoutedEventArgs e)
         {
-            if (_input == null) return;
-            while (_input.Length != 0)
+            if (_inputSrt == null) return;
+            while (_inputSrt.Length != 0)
             {
-                _input = _input.Remove(_input.Length - 1, 1);
+                _inputSrt = _inputSrt.Remove(_inputSrt.Length - 1, 1);
             }
             _flagPoint = false;
             _flagFirstZero = false;
@@ -158,9 +176,9 @@ namespace Calculator.App
         }
         private void Print()
         {
-            if (_input.Length == 0) _input = null;
-            if (_input == null) Input.Text = "0";
-            else Input.Text = _input;
+            if (_inputSrt.Length == 0) _inputSrt = null;
+            if (_inputSrt == null) Input.Text = "0";
+            else Input.Text = _inputSrt;
         }
         private void MultiplicationByIndex(int index)
         {
@@ -189,6 +207,12 @@ namespace Calculator.App
             ListPartsExpression[index] = result.ToString();
             ListPartsExpression.RemoveAt(index + 1);
             ListPartsExpression.RemoveAt(index - 1);
+        }
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

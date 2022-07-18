@@ -41,7 +41,8 @@
                    Grid.Row="1" 
                    Grid.ColumnSpan="5"
                    Style="{StaticResource ResourceKey=TextBlock}"
-                   Text="0"/>
+                   Text="0"
+                   />
         <Button x:Name="Button_1"
                 Content="1"
                 Grid.Column="0" 
