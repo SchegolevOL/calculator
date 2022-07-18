@@ -7,9 +7,6 @@ using System.Windows.Controls;
 
 namespace Calculator.App
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
         private string? _inputSrt = null;
@@ -161,7 +158,7 @@ namespace Calculator.App
             }
             _flagPoint = false;
             _flagFirstZero = false;
-            Print();
+            
         }
         private void ButtonClickC(object sender, RoutedEventArgs e)
         {
@@ -172,14 +169,9 @@ namespace Calculator.App
             }
             _flagPoint = false;
             _flagFirstZero = false;
-            Print();
+            
         }
-        private void Print()
-        {
-            if (_inputSrt.Length == 0) _inputSrt = null;
-            if (_inputSrt == null) Input.Text = "0";
-            else Input.Text = _inputSrt;
-        }
+        
         private void MultiplicationByIndex(int index)
         {
             double result = double.Parse(ListPartsExpression[index - 1]) * double.Parse(ListPartsExpression[index + 1]);

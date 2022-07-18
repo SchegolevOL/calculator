@@ -41,7 +41,7 @@
                    Grid.Row="1" 
                    Grid.ColumnSpan="5"
                    Style="{StaticResource ResourceKey=TextBlock}"
-                   Text="0"
+                   Text="{Binding _inputSrt}"
                    />
         <Button x:Name="Button_1"
                 Content="1"
